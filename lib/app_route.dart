@@ -31,7 +31,7 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (BuildContext context) => CharactersCubit(charactersRepository),
-                  child: CharactersDetailsScreen(character: character),
+                  child: CharacterDetailsScreen(character: character),
                 ));
     }
   }

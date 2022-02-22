@@ -7,15 +7,13 @@ import 'package:breackingbad/data/models/characters.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-class CharactersDetailsScreen extends StatelessWidget {
+class CharacterDetailsScreen extends StatelessWidget {
   final Character character;
 
-  const CharactersDetailsScreen({Key? key, required this.character})
+  const CharacterDetailsScreen({Key? key, required this.character})
       : super(key: key);
 
-
-  Widget buildSliverAppbar() {
+  Widget buildSliverAppBar() {
     return SliverAppBar(
       expandedHeight: 600,
       pinned: true,
@@ -24,11 +22,8 @@ class CharactersDetailsScreen extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         title: Text(
-          character.nickname,
-          style: const TextStyle(
-            color: MyColors.myWight,
-          ),
-          textAlign: TextAlign.start,
+          character.nickName,
+          style: TextStyle(color: MyColors.myWight),
         ),
         background: Hero(
           tag: character.char_id,
@@ -40,27 +35,30 @@ class CharactersDetailsScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget characterInfo(String title, String value) {
     return RichText(
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      text: TextSpan(children: [
-        TextSpan(
-          text: title,
-          style: const TextStyle(
-            color: MyColors.myWight,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: title,
+            style: TextStyle(
+              color: MyColors.myWight,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
-        ),
-        TextSpan(
-          text: value,
-          style: const TextStyle(
-            color: MyColors.myWight,
-            fontSize: 16,
+          TextSpan(
+            text: value,
+            style: TextStyle(
+              color: MyColors.myWight,
+              fontSize: 16,
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 
@@ -68,28 +66,36 @@ class CharactersDetailsScreen extends StatelessWidget {
     return Divider(
       height: 30,
       endIndent: endIndent,
-      thickness: 2,
       color: MyColors.myYellow,
+      thickness: 2,
     );
   }
 
-  Widget displayRandomQouteOrEmptySpace( state){
-    var quotes= (state).quotes;
-    if(quotes.lenght !=0){
-      int randomQuoteIndex=Random().nextInt(quotes.lenght -1);
+  Widget checkIfQuotesAreLoaded(CharactersState state) {
+    if (state is QuotesLoaded) {
+      return displayRandomQuoteOrEmptySpace(state);
+    } else {
+      return showProgressIndicator();
+    }
+  }
+
+  Widget displayRandomQuoteOrEmptySpace(state) {
+    var quotes = (state).quotes;
+    if (quotes.length != 0) {
+      int randomQuoteIndex = Random().nextInt(quotes.length - 1);
       return Center(
         child: DefaultTextStyle(
           textAlign: TextAlign.center,
-          style: const TextStyle(
-              fontSize: 20,
-              color: MyColors.myWight,
-              shadows: [
-                Shadow(
-                  blurRadius: 7,
-                  color: MyColors.myYellow,
-                  offset: Offset(0,0),
-                )
-              ]
+          style: TextStyle(
+            fontSize: 20,
+            color: MyColors.myWight,
+            shadows: [
+              Shadow(
+                blurRadius: 7,
+                color: MyColors.myYellow,
+                offset: Offset(0, 0),
+              )
+            ],
           ),
           child: AnimatedTextKit(
             repeatForever: true,
@@ -98,15 +104,13 @@ class CharactersDetailsScreen extends StatelessWidget {
             ],
           ),
         ),
-
       );
-    }else{
+    } else {
       return Container();
     }
-
   }
 
-  Widget showProgressIndicator(){
+  Widget showProgressIndicator() {
     return Center(
       child: CircularProgressIndicator(
         color: MyColors.myYellow,
@@ -114,32 +118,20 @@ class CharactersDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget checkIfQuotesAreLoaded(CharactersState state) {
-    if (state is QuotesLoaded) {
-      return displayRandomQouteOrEmptySpace(state);
-    }else{
-      return showProgressIndicator();
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
-
     BlocProvider.of<CharactersCubit>(context).getQuotes(character.name);
-
-
     return Scaffold(
       backgroundColor: MyColors.myGrey,
       body: CustomScrollView(
         slivers: [
-          buildSliverAppbar(),
+          buildSliverAppBar(),
           SliverList(
             delegate: SliverChildListDelegate(
               [
                 Container(
-                  margin: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-                  padding: const EdgeInsets.all(8),
+                  margin: EdgeInsets.fromLTRB(14, 14, 14, 0),
+                  padding: EdgeInsets.all(8),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,35 +139,36 @@ class CharactersDetailsScreen extends StatelessWidget {
                       characterInfo('Job : ', character.jobs.join(' / ')),
                       buildDivider(315),
                       characterInfo(
-                          'Appeared in : ', character.categoryForTowsearies),
+                          'Appeared in : ', character.categoryForTwoSeries),
                       buildDivider(250),
-                      characterInfo('seasons : ',
-                          character.aprepenceOffSeasons.join(' / ')),
+                      characterInfo('Seasons : ',
+                          character.appearanceOfSeasons.join(' / ')),
                       buildDivider(280),
-                      characterInfo('status : ', character.statusIfDeadorAlive),
+                      characterInfo('Status : ', character.statusIfDeadOrAlive),
                       buildDivider(300),
-                      character.better_call_saul_appearance.isEmpty
+                      character.betterCallSaulAppearance.isEmpty
                           ? Container()
-                          : characterInfo('Better Call Saul seasons : ',
-                          character.better_call_saul_appearance.join('/')),
-                      character.better_call_saul_appearance.isEmpty
+                          : characterInfo('Better Call Saul Seasons : ',
+                          character.betterCallSaulAppearance.join(" / ")),
+                      character.betterCallSaulAppearance.isEmpty
                           ? Container()
                           : buildDivider(150),
                       characterInfo('Actor/Actress : ', character.actorName),
-                      buildDivider(240),
-                      const SizedBox(
+                      buildDivider(235),
+                      SizedBox(
                         height: 20,
                       ),
                       BlocBuilder<CharactersCubit, CharactersState>(
                         builder: (context, state) {
                           return checkIfQuotesAreLoaded(state);
-                        },),
+                        },
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 500,
-                ),
+                )
               ],
             ),
           ),
